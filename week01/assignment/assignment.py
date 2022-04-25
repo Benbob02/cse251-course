@@ -31,19 +31,22 @@ from cse251turtle import *
 # Include CSE 251 common Python files. 
 from cse251 import *
 
-
+lock = threading.Lock()
 def draw_square(tur, x, y, side, color='black'):
     """Draw Square"""
+    lock.acquire()
     tur.move(x, y)
     tur.setheading(0)
     tur.color(color)
     for _ in range(4):
         tur.forward(side)
         tur.right(90)
+    lock.release()
 
 
 def draw_circle(tur, x, y, radius, color='red'):
     """Draw Circle"""
+    lock.acquire()
     steps = 8
     circumference = 2 * math.pi * radius
 
@@ -57,10 +60,12 @@ def draw_circle(tur, x, y, radius, color='red'):
     for _ in range(steps):
         tur.forward(circumference / steps)
         tur.right(360 / steps)
+    lock.release()
 
 
 def draw_rectangle(tur, x, y, width, height, color='blue'):
     """Draw a rectangle"""
+    lock.acquire()
     tur.move(x, y)
     tur.setheading(0)
     tur.color(color)
@@ -72,16 +77,19 @@ def draw_rectangle(tur, x, y, width, height, color='blue'):
     tur.right(90)
     tur.forward(height)
     tur.right(90)
+    lock.release()
 
 
 def draw_triangle(tur, x, y, side, color='green'):
     """Draw a triangle"""
+    lock.acquire()
     tur.move(x, y)
     tur.setheading(0)
     tur.color(color)
     for _ in range(4):
         tur.forward(side)
         tur.left(120)
+    lock.release()
 
 
 def draw_coord_system(tur, x, y, size=300, color='black'):
@@ -162,6 +170,24 @@ def run_with_threads(tur, log, main_turtle):
     # TODO - Start add your code here.
     # You need to use 4 threads where each thread concurrently drawing one type of shape.
     # You are free to change any functions in this code except main()
+    
+    threads = []
+    threads.append(threading.Thread(target = draw_squares, args=(tur,)))
+    threads.append(threading.Thread(target = draw_circles, args=(tur,)))
+    threads.append(threading.Thread(target = draw_triangles, args=(tur,)))
+    threads.append(threading.Thread(target = draw_rectangles, args=(tur,)))
+
+    for x in threads:
+        x.start()
+        
+    for x in threads:
+        x.join()
+    
+    
+    # t1 = threading.Thread(target = draw_squares, args=(main_turtle))
+    # t1.start()
+    # t1.join()
+
 
     log.step_timer('All drawing commands have been created')
 
