@@ -29,7 +29,7 @@ this dictionary hard coded - use the API call to get this.  Then you can use
 this dictionary to make other API calls for data.
 
 {
-  "people": "http://127.0.0.1:8790/people/", 
+  "characters": "http://127.0.0.1:8790/characters/", 
   "planets": "http://127.0.0.1:8790/planets/", 
   "films": "http://127.0.0.1:8790/films/",
   "species": "http://127.0.0.1:8790/species/", 
@@ -53,11 +53,7 @@ TOP_API_URL = 'http://127.0.0.1:8790'
 # Global Variables
 call_count = 0
 
-all_people = {}
-all_planets = {}
-all_species = {}
-all_vehicles = {}
-all_starships = {}
+
 
 
 # TODO Add your threaded class definition here
@@ -78,35 +74,67 @@ class Request_thread(threading.Thread):
           print('Response =', response.status_code)
 
 # TODO Add any functions you need here
-def getFilm(filmNumber):
-  film_Location = f"{TOP_API_URL}/films/{filmNumber}/"
-  print(film_Location)
-  total = (Request_thread(film_Location))
+def get_element_threads(paths):
+  threads = []
+  for x in paths:
+    threads.append(Request_thread(x))
+  for x in threads:
+    x.start()
+  for x in threads:
+    x.join()
+  return threads
 
-  total.start()
-  total.join()
-  global all_people
-  people = total.response["characters"]
-  planets = total.response["planets"]
-  species = total.response["species"]
-  vehicles = total.response["vehicles"]
-  starships = total.response["starships"]
-  add = {}
-  add = all_people.copy()
-  pos = ""
-  for x in people:
-    pos = ""
-    if x[len(x)-3] != f"/":
-      pos = f"{x[len(x)-3]}"
-    pos = (f"{pos}{x[len(x)-2]}")
-    for i in all_people:
-      if i[0] != x:
-        add[pos] = x 
-    if len(all_people) == 0:
-      add[pos] = x 
-  all_people = add.copy()
+def get_element(movie_info, element):
+  return_text = movie_info[element]
+  return return_text
+
+def print_element(elements):
+  
+  full_text = ""
+  for x in elements:
+    text = x.response ["name"]
+    full_text = f"{full_text}{text}, "
+  print(full_text)
+  print()
+
+def display_movie(movie_info):
+  text = ""
+
+  title = get_element(movie_info,"title")
+  print(f"Title: {title}")
+
+  director = get_element(movie_info,"director")
+  print(f"Director: {director}")
+
+  producer = get_element(movie_info,"producer")
+  print(f"Producer: {producer}")
+
+  released = get_element(movie_info,"release_date")
+  print(f"Released: {released}")
+
+  characters_paths = get_element(movie_info, "characters")
+  characters = get_element_threads(characters_paths)
+  print(f"Characters: {len(characters)}")
+  print_element(characters)
+
+  species_path = get_element(movie_info, "species")
+  species = get_element_threads(species_path)
+  print(f"Species: {len(species)}")
+  print_element(species)
+
+  vehicles_path = get_element(movie_info, "vehicles")
+  vehicles = get_element_threads(vehicles_path)
+  print(f"Vehicles: {len(vehicles)}")
+  print_element(vehicles)
+
+  starships_path = get_element(movie_info, "starships")
+  starships = get_element_threads(starships_path)
+  print(f"Starships: {len(starships)}")
+  print_element(starships)
+
 
   
+
 
 
 def main():
@@ -120,21 +148,28 @@ def main():
   base_t.start()
   base_t.join()
   # TODO Retireve Details on film 6
-  # if base_t.response != {}:
-  #   for i in base_t.response:
-  #     threads.append(Request_thread(base_t.response [i]))
+  films = []
 
+  for x in range(1,7):
+    film_path = f"{TOP_API_URL}/films/{x}"
+    films.append(Request_thread(film_path))
 
-  #   for i in threads:
-  #     i.start()
-  #   for i in threads:
-  #     i.join()
-  getFilm(1)
-  print(all_people)
+  for x in films:
+    x.start()
+  for x in films:
+    x.join()
+  
+  # get each movie with a thread
+
+  #
 
   # TODO Display results
   # for i in threads:
   #   print(i.response)
+  for x in films:
+    display_movie(x.response)
+    print()
+  
   log.stop_timer('Total Time To complete')
   log.write(f'There were {call_count} calls to the server')
   
