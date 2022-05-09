@@ -3,13 +3,9 @@ Course: CSE 251
 Lesson Week: 03
 File: team.py
 Author: Brother Comeau
-
 Purpose: Team Activity: 
-
 Instructions:
-
 - Review instructions in I-Learn
-
 """
 
 import random
@@ -124,18 +120,19 @@ class Board():
                     print(f'{self.board[row][col]} ', end='')
             print()
 
-    def _word_at_this_location(self, row, col, direction, word):
+    def _word_at_this_location(self, row, col, direction, word, should_highlight = False):
         """ Helper function: is the word found on the board at (x, y) in a direction """
         dir_x, dir_y = self.directions[direction]
-        highlight_copy = copy.deepcopy(self.highlighting)
+        # highlight_copy = copy.deepcopy(self.highlighting)
         for letter in word:
             board_letter = self.get_letter(row, col)
             if board_letter == letter:
-                self.highlight(row, col)
+                if should_highlight:
+                    self.highlight(row, col)
                 row += dir_x
                 col += dir_y
             else:
-                self.highlighting = copy.deepcopy(highlight_copy)
+                # self.highlighting = copy.deepcopy(highlight_copy)
                 return False
         return True
 
@@ -146,6 +143,7 @@ class Board():
             for col in range(self.size):
                 for d in range(0, 8):
                     if self._word_at_this_location(row, col, d, word):
+                        self._word_at_this_location(row, col, d, word, True)
                         return True
         return False
 
