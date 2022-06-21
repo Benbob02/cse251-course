@@ -39,8 +39,11 @@ def is_prime(n: int) -> bool:
     return True
 
 # TODO create read_thread function
-
+def read_thread():
+    pass
 # TODO create prime_process function
+def prime_process():
+    pass
 
 def create_data_txt(filename):
     with open(filename, 'w') as f:
@@ -62,7 +65,7 @@ def main():
     # TODO Create shared data structures
 
     # TODO create reading thread
-
+    read = threading.Thread(target= read_thread)
     # TODO create prime processes
 
     # TODO Start them all
